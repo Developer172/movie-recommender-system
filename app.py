@@ -1,10 +1,8 @@
-import sklearn
-st.write("sklearn version:", sklearn.__version__)
 import pickle
 import streamlit as st
 import pandas as pd
 import requests
-from sklearn.metrics.pairwise import cosine_similarity
+import numpy as np
 
 
 # -----------------------------
@@ -51,11 +49,14 @@ movies = pd.DataFrame(movies_dict)
 
 
 # -----------------------------
-# Compute Similarity (NO similarity.pkl)
+# Compute Similarity (NO sklearn, NO similarity.pkl)
 # -----------------------------
 @st.cache_data
 def load_similarity(dataframe):
-    return cosine_similarity(dataframe)
+    data = dataframe.select_dtypes(include=[np.number]).values
+    norm = np.linalg.norm(data, axis=1)
+    similarity = np.dot(data, data.T) / (norm[:, None] * norm[None, :])
+    return similarity
 
 similarity = load_similarity(movies)
 
@@ -94,4 +95,3 @@ if st.button('Recommend'):
     with col5:
         st.text(names[4])
         st.image(posters[4])
-
