@@ -3,6 +3,7 @@ import streamlit as st
 import pandas as pd
 import requests
 import numpy as np
+from sklearn.feature_extraction.text import CountVectorizer
 
 
 # -----------------------------
@@ -49,20 +50,23 @@ movies = pd.DataFrame(movies_dict)
 
 
 # -----------------------------
-# Compute Similarity (NO sklearn, NO similarity.pkl)
+# FIXED SIMILARITY LOGIC (IMPORTANT)
 # -----------------------------
 @st.cache_data
-def load_similarity(dataframe):
-    data = dataframe.select_dtypes(include=[np.number]).values
-    norm = np.linalg.norm(data, axis=1)
-    similarity = np.dot(data, data.T) / (norm[:, None] * norm[None, :])
+def load_similarity(df):
+    cv = CountVectorizer(max_features=5000, stop_words='english')
+    vectors = cv.fit_transform(df['tags']).toarray()
+
+    norm = np.linalg.norm(vectors, axis=1)
+    similarity = np.dot(vectors, vectors.T) / (norm[:, None] * norm[None, :])
+
     return similarity
 
 similarity = load_similarity(movies)
 
 
 # -----------------------------
-# Streamlit UI
+# Streamlit UI (UNCHANGED)
 # -----------------------------
 st.title('Movie Recommender System')
 
