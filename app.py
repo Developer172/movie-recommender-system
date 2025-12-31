@@ -1,3 +1,5 @@
+import sklearn
+st.write("sklearn version:", sklearn.__version__)
 import pickle
 import streamlit as st
 import pandas as pd
@@ -92,3 +94,4 @@ if st.button('Recommend'):
     with col5:
         st.text(names[4])
         st.image(posters[4])
+
